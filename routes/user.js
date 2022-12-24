@@ -19,7 +19,6 @@ router.post('/login',async (req,res,next)=>{
 })
 // verify auth on following routes
 router.use((req,res,next)=>{
-    console.log(req.token)
     if(!req.headers||!req.headers.authorization) next(new Error('Missing token!'))
     else{
         const token = User.auth(req.headers.authorization.split(' ')[1])
