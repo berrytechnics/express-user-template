@@ -1,0 +1,36 @@
+version: '3'
+services:
+  app:
+    build: .
+    container_name: user-template
+    ports:
+      - 80:4200
+    environment:
+      - MYSQL_DATABASE
+      - DB_HOST
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - JWT_SECRET
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    image: mysql
+    container_name: user-template-database
+    ports:
+      - 3306
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_RANDOM_ROOT_PASSWORD
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    volumes:
+      - user-dbstore:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 55
+volumes:
+  user-dbstore:
