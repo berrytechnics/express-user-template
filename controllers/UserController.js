@@ -17,6 +17,15 @@ class User {
         this.id = newUser.id
         return false
     }
+    async deregister(password){
+        const foundUser = await UserModel.findOne({where:{email:this.email}})
+        if(!foundUser) return {error:'User not registered!'}
+        else{
+            const auth = bcrypt.compareSync(password,this.password)
+            if(!auth) return ({error:"Invalid credentials!"})
+            else return await foundUser.destroy()
+        }
+    }
     async update(user){
         for(const [key,val] of Object.entries(user)){
             this[key] = val
