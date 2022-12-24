@@ -7,7 +7,7 @@ class User {
         this.email=email
         this.firstName=firstName
         this.lastName=lastName
-        this.password=null
+        this.password
     }
     async register(password){
         const found = await UserModel.findOne({where:{email:this.email}})
@@ -16,6 +16,12 @@ class User {
         const newUser = await UserModel.create(this)
         this.id = newUser.id
         return false
+    }
+    async update(user){
+        for(const [key,val] of Object.entries(user)){
+            this[key] = val
+        }
+        await UserModel.update(this)
     }
     static async login(email,password){
         const foundUser = await UserModel.findOne({where:{email:email}})

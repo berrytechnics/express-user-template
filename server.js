@@ -7,7 +7,7 @@ app.use(express.json())
 app.use('/',indexRouter)
 app.use('/user',userRouter)
 app.use((err,req,res,next)=>{
-    err ? res.send({error:err.stack}) : res.send({error:'An unknown error occurred!'})
+    err ? res.send(err.stack) : res.send({error:'An unknown error occurred!'})
 })
 app.listen(process.env.PORT,async()=>{
     try{
