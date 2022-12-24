@@ -13,5 +13,23 @@ router.post('/register',async (req,res,next)=>{
         err ? next(new Error(err)) : res.json(user)
     }
 })
+router.post('/login',async (req,res,next)=>{
+    const token = await User.login(req.body.email,req.body.password)
+    res.json(token)
+})
+// verify auth on following routes
+router.use((req,res,next)=>{
+    console.log(req.token)
+    if(!req.headers||!req.headers.authorization) next(new Error('Missing token!'))
+    else{
+        const token = User.auth(req.headers.authorization.split(' ')[1])
+        if(token.error) next(new Error(token.error))
+        else {
+            req.headers.authorization=`BEARER ${token}`
+            next()
+        }
+    }
+})
+router.get('/test',(req,res,next)=>res.sendStatus(200))
 
 export default router

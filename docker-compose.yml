@@ -11,6 +11,8 @@ services:
       - MYSQL_USER
       - MYSQL_PASSWORD
       - JWT_SECRET
+      - JWT_EXPIRATION
+      - JWT_REFRESH_MINUTES
     depends_on:
       database:
         condition: service_healthy
