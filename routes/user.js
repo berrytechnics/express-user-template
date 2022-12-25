@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {User} from '../controllers/UserController.js'
+import { User } from '../controllers/UserController.js'
 const router = Router()
 
 router.post('/register',async (req,res,next)=>{
@@ -28,6 +28,15 @@ router.use((req,res,next)=>{
             next()
         }
     }
+})
+router.post('/deregister',async(req,res,next)=>{
+    try{
+        const token = User.decodeToken(req.headers.authorization.split(" ")[1])
+        const user = await User.find(token.id)
+        user.deregister(req.body.password)
+        res.json({message:"User deregistered"})
+    }
+    catch(e){next(e)}
 })
 router.get('/test',(req,res,next)=>res.sendStatus(200))
 

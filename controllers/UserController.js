@@ -1,7 +1,7 @@
 import {UserModel} from '../models/UserModel.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
-class User {
+export class User {
     constructor(email,firstName,lastName){
         this.id
         this.email=email
@@ -15,7 +15,7 @@ class User {
         this.password = bcrypt.hashSync(password,10)
         const newUser = await UserModel.create(this)
         this.id = newUser.id
-        return false
+        return this
     }
     async deregister(password){
         const foundUser = await UserModel.findOne({where:{email:this.email}})
@@ -30,7 +30,7 @@ class User {
         for(const [key,val] of Object.entries(user)){
             this[key] = val
         }
-        await UserModel.update(this)
+        return await UserModel.update(this)
     }
     static async login(email,password){
         const foundUser = await UserModel.findOne({where:{email:email}})
@@ -42,12 +42,16 @@ class User {
             else return {token:jwt.sign({id:foundUser.id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRATION})}
         }
     }
+    static async find(id){
+        UserModel.findOne({where:{id:id}}).then(user=>user).catch(e=>{error:'No user found!'})
+    }
     static auth(token){
         const validToken = jwt.verify(token,process.env.JWT_SECRET)
-        const expiration = new Date(validToken.exp*1000)
         if(!validToken) return {error:'Invalid or expired token!'}
-        else if(new Date(Date.now()+(1000*60*process.env.JWT_REFRESH_MINUTES))>expiration) return {new:true,token:jwt.sign({id:validToken.id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRATION})}
+        else if(new Date(Date.now()+(1000*60*process.env.JWT_REFRESH_MINUTES))>new Date(validToken.exp*1000)) return {new:true,token:jwt.sign({id:validToken.id},process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRATION})}
         else return {token:token}
     }
+    static decodeToken(token){
+        jwt.verify(token,process.env.JWT_SECRET)
+    }
 }
-export {User}
