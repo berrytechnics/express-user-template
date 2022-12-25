@@ -15,7 +15,7 @@ export class User {
         this.password = bcrypt.hashSync(password,10)
         const newUser = await UserModel.create(this)
         this.id = newUser.id
-        return this
+        return newUser
     }
     async deregister(password){
         const foundUser = await UserModel.findOne({where:{email:this.email}})
